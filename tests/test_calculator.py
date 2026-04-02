@@ -1,11 +1,11 @@
-from app.calculator import sum, resta
+from app.calculator import multiply, sum, resta
 
 def test_sum() -> None:
     assert sum(2, 3) == 5
     
 def test_resta() -> None:
-    assert resta(5, 3) == 1
+    assert resta(5, 3) == 2
 
-def test_fail() -> None:
-    assert False, "This test is meant to fail"
+def test_multiply() -> None:
+    assert multiply(2, 3) == 6
 
