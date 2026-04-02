@@ -22,8 +22,3 @@ def resta_endpoint(request: OperationRequest):
 def multiply_endpoint(request: OperationRequest):
     result = multiply(request.a, request.b)
     return {"result": result}
-
-@app.post("/multiply")
-def multiply_endpoint(request: OperationRequest):
-    result = multiply(request.a, request.b)
-    return {"result": result}
