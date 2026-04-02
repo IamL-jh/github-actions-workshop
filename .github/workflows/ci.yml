@@ -1,5 +1,5 @@
 
-
+name: mi primer CI
 
 on:
   push:
@@ -9,19 +9,39 @@ on:
 #Jobs
 # Con una misma tuberia CI se pueden validar multiples confg. de ento
 jobs:
-  test:
+
+  lint:
     runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      
+      - name: Set up python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run lint
+        run: ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    
     strategy:
       matrix:
         python-version: ["3.10", "3.13"]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       
