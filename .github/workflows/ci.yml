@@ -90,12 +90,14 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-workshop
           tags: |
-            type: raw, value=latest
+            type:raw,value=latest
+            type:raw,value=main,enable={{is_default_branch}}
             type:ref,event=branch
             type:ref,event=tag
             type:sha
 
-
+      - name: Print generated Tags
+        run: echo "${ { steps.metadata.outputs.tags } }"
       - name: Build & push Docker image
         uses: docker/build-push-action@v6
         with:
