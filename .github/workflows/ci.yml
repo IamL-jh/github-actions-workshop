@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Build docker image
-        run: docker build -t github-actions-workshop:latests .
+        run: docker build -t github-actions-workshop:latest .
 
   docker-push:
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-workshop
+          images: ${{ secrets.DOCKERHUB_USUARIO }}/github-actions-workshop
           tags: |
             type=raw,value=latest
             type=raw,value=main,enable={{is_default_branch}}
