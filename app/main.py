@@ -11,6 +11,7 @@ class OperationRequest(BaseModel):
 @app.post("/sum")
 def sum_endpoint(request: OperationRequest):
     result = sum(request.a, request.b)
+    print("this is a dev test")
     return {"result": result}
 
 @app.post("/resta")

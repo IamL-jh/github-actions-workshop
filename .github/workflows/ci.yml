@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker-build
 
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     permissions:
       contents: read
@@ -92,7 +92,7 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USUARIO }}/github-actions-workshop
           tags: |
-            type=raw,value=latest
+            type=raw,value=main,enable={{github.ref == 'refs/heads/main'}}
             type=raw,value=main,enable={{is_default_branch}}
             type=ref,event=branch
             type=ref,event=tag
@@ -122,13 +122,54 @@ jobs:
       - name: Trigger render PROD deploy
         run: curl -X POST "${{ secrets.RENDER_PROD_DEPLOY_HOOK }}"
 
+  docker-push-dev:
+    runs-on: ubuntu-latest
+    needs: docker-build
+
+    if: github.event_name == 'push'
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login in Docker hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USUARIO }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USUARIO }}/github-actions-workshop
+          tags: |
+            type=raw,value=dev
+            type=raw,value=dev,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=ref,event=tag
+            type=sha
+
+      - name: Print generated Tags
+        run: echo "${{ steps.meta.outputs.tags }}"
+
+      - name: Build & push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
   deploy-dev:
     runs-on: ubuntu-latest
-    needs: docker-push
-
+    needs: docker-push-dev
     if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
     
     steps:
       - name: Trigger render DEV deploy
         run: curl -X POST "${{ secrets.RENDER_DEV_DEPLOY_HOOK }}"
-    
