@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - dev
     
     tags:
       - 'v*.*.*'
@@ -109,6 +110,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+          
+
   deploy-prod:
     runs-on: ubuntu-latest
     needs: docker-push
@@ -118,3 +121,14 @@ jobs:
     steps:
       - name: Trigger render PROD deploy
         run: curl -X POST "${{ secrets.RENDER_PROD_DEPLOY_HOOK }}"
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: docker-push
+
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+    
+    steps:
+      - name: Trigger render DEV deploy
+        run: curl -X POST "${{ secrets.RENDER_DEV_DEPLOY_HOOK }}"
+    
